@@ -21,7 +21,13 @@ For a given project/task and team member:
 - **Deadline** — whether the person's free hours per week are enough to
   finish the estimated work before the deadline.
 
-The overall score is the average of the four category scores (out of 10).
+The overall score is a weighted average of the four category scores (out
+of 10). By default the categories are weighted **Skills 5, Capacity 4,
+Deadline 2, Growth 1** — skill match matters most, followed by available
+bandwidth, then schedule feasibility, with growth fit as a light
+tiebreaker. Weights are adjustable with the sliders at the top of the
+Allocation tab and are saved per browser.
+
 Team members are ranked highest to lowest for the selected project, and
 the top one is marked **Recommended**. A person is flagged **"At risk of
 missing deadline"** when their free capacity isn't enough to finish the

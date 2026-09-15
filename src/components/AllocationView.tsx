@@ -1,7 +1,10 @@
 import { useMemo, useState } from 'react'
-import type { ProjectTask, Resource } from '../types'
+import type { CategoryWeights, ProjectTask, Resource } from '../types'
+import { DEFAULT_WEIGHTS } from '../types'
 import { rankResourcesForTask } from '../lib/scoring'
+import { loadFromStorage, saveToStorage } from '../lib/storage'
 import ScoreBar from './ScoreBar'
+import WeightEditor from './WeightEditor'
 
 export default function AllocationView({
   resources,
@@ -13,9 +16,17 @@ export default function AllocationView({
   const [selectedTaskId, setSelectedTaskId] = useState<string>(tasks[0]?.id ?? '')
   const selectedTask = tasks.find((t) => t.id === selectedTaskId)
 
+  const [weights, setWeights] = useState<CategoryWeights>(() =>
+    loadFromStorage('bs-weights', DEFAULT_WEIGHTS),
+  )
+  function updateWeights(next: CategoryWeights) {
+    setWeights(next)
+    saveToStorage('bs-weights', next)
+  }
+
   const ranked = useMemo(
-    () => (selectedTask ? rankResourcesForTask(resources, selectedTask) : []),
-    [resources, selectedTask],
+    () => (selectedTask ? rankResourcesForTask(resources, selectedTask, weights) : []),
+    [resources, selectedTask, weights],
   )
 
   if (tasks.length === 0) {
@@ -36,6 +47,8 @@ export default function AllocationView({
 
   return (
     <div className="space-y-5">
+      <WeightEditor weights={weights} onChange={updateWeights} />
+
       <label className="block max-w-md text-sm">
         <span className="mb-1 block font-medium text-gray-700">Project / task</span>
         <select
@@ -113,10 +126,10 @@ export default function AllocationView({
               </div>
             </div>
             <div className="grid grid-cols-1 gap-1.5 sm:grid-cols-2">
-              <ScoreBar label="Skills" score={r.scores.skills} />
-              <ScoreBar label="Growth" score={r.scores.growth} />
-              <ScoreBar label="Capacity" score={r.scores.capacity} />
-              <ScoreBar label="Deadline" score={r.scores.deadline} />
+              <ScoreBar label={`Skills ×${weights.skills}`} score={r.scores.skills} />
+              <ScoreBar label={`Growth ×${weights.growth}`} score={r.scores.growth} />
+              <ScoreBar label={`Capacity ×${weights.capacity}`} score={r.scores.capacity} />
+              <ScoreBar label={`Deadline ×${weights.deadline}`} score={r.scores.deadline} />
             </div>
           </div>
         ))}

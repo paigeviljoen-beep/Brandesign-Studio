@@ -1,4 +1,5 @@
-import type { CategoryScore, ProjectTask, Resource, ResourceScore } from '../types'
+import type { CategoryScore, CategoryWeights, ProjectTask, Resource, ResourceScore } from '../types'
+import { DEFAULT_WEIGHTS } from '../types'
 
 const MS_PER_WEEK = 1000 * 60 * 60 * 24 * 7
 
@@ -71,7 +72,11 @@ export function scoreDeadline(
   return { score, weeksUntilDeadline, requiredWeeks }
 }
 
-export function scoreResourceForTask(resource: Resource, task: ProjectTask): ResourceScore {
+export function scoreResourceForTask(
+  resource: Resource,
+  task: ProjectTask,
+  weights: CategoryWeights = DEFAULT_WEIGHTS,
+): ResourceScore {
   const skills = scoreSkills(resource, task)
   const growth = scoreGrowth(resource, task)
   const capacity = scoreCapacity(resource)
@@ -84,7 +89,13 @@ export function scoreResourceForTask(resource: Resource, task: ProjectTask): Res
     deadline: deadline.score,
   }
 
-  const total = (scores.skills + scores.growth + scores.capacity + scores.deadline) / 4
+  const weightSum = weights.skills + weights.growth + weights.capacity + weights.deadline
+  const weightedSum =
+    scores.skills * weights.skills +
+    scores.growth * weights.growth +
+    scores.capacity * weights.capacity +
+    scores.deadline * weights.deadline
+  const total = weightSum > 0 ? weightedSum / weightSum : 0
 
   return {
     resource,
@@ -98,8 +109,12 @@ export function scoreResourceForTask(resource: Resource, task: ProjectTask): Res
 }
 
 /** Ranks every resource for a given task, highest total score first. */
-export function rankResourcesForTask(resources: Resource[], task: ProjectTask): ResourceScore[] {
+export function rankResourcesForTask(
+  resources: Resource[],
+  task: ProjectTask,
+  weights: CategoryWeights = DEFAULT_WEIGHTS,
+): ResourceScore[] {
   return resources
-    .map((r) => scoreResourceForTask(r, task))
+    .map((r) => scoreResourceForTask(r, task, weights))
     .sort((a, b) => b.total - a.total)
 }

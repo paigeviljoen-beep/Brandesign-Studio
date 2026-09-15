@@ -8,7 +8,7 @@ export default function ScoreBar({ label, score }: { label: string; score: numbe
   const pct = Math.max(0, Math.min(100, (score / 10) * 100))
   return (
     <div className="flex items-center gap-2 text-sm">
-      <span className="w-20 shrink-0 text-gray-600">{label}</span>
+      <span className="w-28 shrink-0 text-gray-600">{label}</span>
       <div className="h-2 flex-1 overflow-hidden rounded-full bg-gray-200">
         <div
           className="h-full rounded-full transition-all"

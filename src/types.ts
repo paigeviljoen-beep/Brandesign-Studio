@@ -36,6 +36,15 @@ export interface CategoryScore {
   deadline: number
 }
 
+export type CategoryWeights = CategoryScore
+
+export const DEFAULT_WEIGHTS: CategoryWeights = {
+  skills: 5,
+  capacity: 4,
+  deadline: 2,
+  growth: 1,
+}
+
 export interface ResourceScore {
   resource: Resource
   scores: CategoryScore
