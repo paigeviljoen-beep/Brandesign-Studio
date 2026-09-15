@@ -1,0 +1,93 @@
+import type { Resource } from '../types'
+
+export default function ResourceList({
+  resources,
+  onEdit,
+  onDelete,
+}: {
+  resources: Resource[]
+  onEdit: (resource: Resource) => void
+  onDelete: (id: string) => void
+}) {
+  if (resources.length === 0) {
+    return (
+      <p className="rounded-xl border border-dashed border-gray-300 p-8 text-center text-gray-500">
+        No team members yet. Add one to get started.
+      </p>
+    )
+  }
+
+  return (
+    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
+      {resources.map((r) => {
+        const free = Math.max(0, r.capacityHoursPerWeek - r.allocatedHoursPerWeek)
+        return (
+          <div key={r.id} className="rounded-xl border border-gray-200 bg-white p-4">
+            <div className="flex items-start justify-between">
+              <div className="flex items-center gap-3">
+                <span
+                  className="flex h-9 w-9 items-center justify-center rounded-full text-sm font-semibold text-white"
+                  style={{ background: r.color }}
+                >
+                  {r.name
+                    .split(' ')
+                    .map((p) => p[0])
+                    .join('')
+                    .slice(0, 2)}
+                </span>
+                <div>
+                  <p className="font-medium text-gray-900">{r.name}</p>
+                  <p className="text-xs text-gray-500">{r.role}</p>
+                </div>
+              </div>
+              <div className="flex gap-1">
+                <button
+                  type="button"
+                  onClick={() => onEdit(r)}
+                  className="rounded-md px-2 py-1 text-xs font-medium text-gray-500 hover:bg-gray-100"
+                >
+                  Edit
+                </button>
+                <button
+                  type="button"
+                  onClick={() => onDelete(r.id)}
+                  className="rounded-md px-2 py-1 text-xs font-medium text-red-500 hover:bg-red-50"
+                >
+                  Delete
+                </button>
+              </div>
+            </div>
+
+            <div className="mt-3 flex flex-wrap gap-1">
+              {r.skills.map((s) => (
+                <span
+                  key={s.name}
+                  className="rounded-full bg-gray-100 px-2 py-0.5 text-xs text-gray-600"
+                >
+                  {s.name} · {s.level}
+                </span>
+              ))}
+            </div>
+
+            {r.growthAreas.length > 0 && (
+              <div className="mt-2 flex flex-wrap gap-1">
+                {r.growthAreas.map((g) => (
+                  <span
+                    key={g}
+                    className="rounded-full bg-violet-50 px-2 py-0.5 text-xs text-violet-600"
+                  >
+                    ↗ {g}
+                  </span>
+                ))}
+              </div>
+            )}
+
+            <p className="mt-3 text-xs text-gray-500">
+              {free} / {r.capacityHoursPerWeek} hrs/week free
+            </p>
+          </div>
+        )
+      })}
+    </div>
+  )
+}
