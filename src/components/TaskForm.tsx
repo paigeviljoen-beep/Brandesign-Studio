@@ -2,6 +2,13 @@ import { useState } from 'react'
 import type { ProjectTask, RequiredSkill } from '../types'
 import TagInput from './TagInput'
 
+const SIZE_PRESETS: { label: string; hours: number }[] = [
+  { label: 'Quick', hours: 1 },
+  { label: 'Half day', hours: 4 },
+  { label: 'Full day', hours: 8 },
+  { label: 'Multi-day', hours: 24 },
+]
+
 function emptyTask(): ProjectTask {
   const d = new Date()
   d.setDate(d.getDate() + 14)
@@ -141,6 +148,22 @@ export default function TaskForm({
             value={task.estimatedHours}
             onChange={(e) => setTask((t) => ({ ...t, estimatedHours: Number(e.target.value) }))}
           />
+          <div className="mt-1.5 flex flex-wrap gap-1">
+            {SIZE_PRESETS.map((preset) => (
+              <button
+                key={preset.label}
+                type="button"
+                onClick={() => setTask((t) => ({ ...t, estimatedHours: preset.hours }))}
+                className={`rounded-full border px-2.5 py-0.5 text-xs font-medium ${
+                  task.estimatedHours === preset.hours
+                    ? 'border-violet-300 bg-violet-100 text-violet-700'
+                    : 'border-gray-300 text-gray-500 hover:bg-gray-50'
+                }`}
+              >
+                {preset.label} ({preset.hours}h)
+              </button>
+            ))}
+          </div>
         </label>
         <label className="block text-sm">
           <span className="mb-1 block font-medium text-gray-700">Deadline</span>
